@@ -88,12 +88,11 @@ def dbOption(Option):
 
     else:
         print("Invalid choice, please select another.")
-        
 
 def getOption():
     '''
     This function gets input from user, if input is correct (inside the set {1,2,3,4,5}) then return input.
-    Else returns -1.
+    Else returns 0.
     '''
     option = input()
     try:
@@ -132,10 +131,10 @@ def interface():
         temp = getOption()
 
         if temp:
+            Option = temp
             dbOption(temp)
         
     print("Conference management system will now terminate")
-    conn.close()
 
 if __name__ == "__main__":
     interface()
