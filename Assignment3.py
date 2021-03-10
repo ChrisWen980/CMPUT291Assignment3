@@ -33,14 +33,10 @@ def dbOption(Option):
         rows=c.fetchall()
         print(rows)
 
-
         #c.execute("PRAGMA table_info(reviews)")
         #print(c.fetchall())
         #c.execute("PRAGMA table_info(papers)")
         #print(c.fetchall())
-
-
-
 
     elif (Option == 2):
         # This statement can be removed later
@@ -50,8 +46,6 @@ def dbOption(Option):
         # Given a user's email, which is to be provided at query time, list only the titles of the papers he/she was assigned to review. The papers should 
         # be ordered by their (paper) ids (even though that is not to be displayed).  If users were not assigned to review any paper, an informative answer, 
         # e.g, "No paper has been assigned to this reviewer” should be displayed.
-
-
 
     elif (Option == 3): 
         # This statement can be removed later
@@ -69,8 +63,6 @@ def dbOption(Option):
         rows=c.fetchall()
         print(rows)
 
-
-
     elif (Option == 4):
         # This statement can be removed later
         print("You chose Option 4: Find papers according to difference score.")
@@ -81,10 +73,9 @@ def dbOption(Option):
         #  --which is to be created only once when the application is opened-- find the email addresses and names of the reviewers that have reviewed a paper 
         # with a "difference” between X (inclusive) and Y (inclusive) where X and Y are to be provided at query time.
 
-
-
     elif (Option == 5):
         print("You chose Option 5: Exit.")
+        conn.close()
 
     else:
         print("Invalid choice, please select another.")
