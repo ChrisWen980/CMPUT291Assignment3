@@ -1,8 +1,21 @@
+'''
+CMPUT 291 Winter 2021
+Assignment 3
+Ahmad Amin, Chris Wen
+'''
 import sqlite3
 
 
-# This function contains the 4 options
 def dbOption(Option):
+    '''
+    This function contains the implementation for the four options.
+    '''
+
+    conn = sqlite3.connect('A3.db')
+    c = conn.cursor()
+    c.execute('PRAGMA foreign_keys=ON;')
+    conn.commit()
+    
     if (Option == 1):
         # This statement can be removed later
         print("You chose Option 1: Find accepted papers.")
@@ -76,44 +89,53 @@ def dbOption(Option):
     else:
         print("Invalid choice, please select another.")
         
-        
-        
-        
 
-# Welcome interface statement
-
-print("Welcome to the conference management system")
-
-Option = 0
-conn = sqlite3.connect('A3.db')
-c = conn.cursor()
-c.execute('PRAGMA foreign_keys=ON;')
-conn.commit()
-
-inputType = False
-
-while(Option != 5):
-    # Interface Setup Statements
-    print("\n")
-    print("Please select an option by entering a number: ")
-    print("1. Find accepted papers")
-    print("2. Find papers assigned for review")
-    print("3. Find papers with inconsistent reviews")
-    print("4. Find papers according to difference score")
-    print("5. Exit")
-    print("Option: ", end = '')
-
-    # User enters in a number which will represent a question
-    
+def getOption():
+    '''
+    This function gets input from user, if input is correct (inside the set {1,2,3,4,5}) then return input.
+    Else returns -1.
+    '''
+    option = input()
     try:
-        Option = int(input())
-        inputType = True
+        option = int(option)
     except:
-        print("Option choice is of incorrect type")
-
-    if (inputType == True):
-        dbOption(Option)
-        inputType = False
+        print("Error: Option choice is of incorrect type")
+        return 0
     
-print("Conference management system will now terminate")
-conn.close()
+    if option in {1, 2, 3, 4, 5}:
+        return option
+    
+    print("Error: Option choice must be 1, 2, 3, 4, or 5")
+    return 0
+        
+def interface():
+    '''
+    This function handles the interface portion.
+    Calls getOption() to handle input.
+    Calls dbOption() to process input.
+    '''
+
+    print("Welcome to the conference management system")
+
+    Option = 0
+
+    while(Option != 5):
+        print("\n")
+        print("Please select an option by entering a number: ")
+        print("1. Find accepted papers")
+        print("2. Find papers assigned for review")
+        print("3. Find papers with inconsistent reviews")
+        print("4. Find papers according to difference score")
+        print("5. Exit")
+        print("Option: ", end = '')
+        
+        temp = getOption()
+
+        if temp:
+            dbOption(temp)
+        
+    print("Conference management system will now terminate")
+    conn.close()
+
+if __name__ == "__main__":
+    interface()
