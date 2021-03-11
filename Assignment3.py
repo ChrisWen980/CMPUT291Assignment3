@@ -10,6 +10,7 @@ To Do:
 Clarify with TA:
 For option 2 order increasing or decreasing?
 For p1, p2 do we need different erorr message for valid area/email with no output vs invalid area/email?
+For p1, p2 do we lose marks for for ___ in rows: print __[0] (is there a way to do this in SQL?)
 
 Implement error handling in option 3,4
 "Some simple error handling should be performed, and the application should not crash "easily.” 
@@ -46,7 +47,8 @@ def dbOption(Option):
         if not rows:
             print("No accepted paper titles given this area")
         else:
-            print(rows)
+            for ttitle in rows:
+                print(ttitle[0])
 
         #c.execute("PRAGMA table_info(reviews)")
         #print(c.fetchall())
@@ -62,16 +64,16 @@ def dbOption(Option):
         # be ordered by their (paper) ids (even though that is not to be displayed).  If users were not assigned to review any paper, an informative answer, 
         # e.g, "No paper has been assigned to this reviewer” should be displayed.
 
-        '''
         print("Please choose an email: ", end = '')
         Email = input()
-        c.execute("SELECT DISTINCT(p.title) FROM papers p, reviews r, users u WHERE r.paper = p.id AND r.reviewer = u.email AND u.email =:email ORDER BY p.id", {"email":Email})
+        c.execute("SELECT p.title FROM papers p, reviews r WHERE r.paper = p.id AND r.reviewer=:email ORDER BY p.id", {"email":Email})
         rows=c.fetchall()
         if not rows:
             print("No paper has been assigned to this reviewer")
         else:
-            print(rows)
-        '''
+            for eemail in rows:
+                print(eemail[0])
+
 
     elif (Option == 3): 
         # This statement can be removed later
