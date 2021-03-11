@@ -9,6 +9,7 @@ To Do:
 
 Clarify with TA:
 For option 2 order increasing or decreasing?
+For p1, p2 do we need different erorr message for valid area/email with no output vs invalid area/email?
 
 Implement error handling in option 3,4
 "Some simple error handling should be performed, and the application should not crash "easily.” 
@@ -36,7 +37,7 @@ def dbOption(Option):
         # order of their average overall review scores. 
 
         print("Please choose an area: ", end = '')
-        Area = str(input())
+        Area = input()
         Decision = 'A'
         
         c.execute("SELECT DISTINCT(papers.title) FROM papers JOIN reviews ON papers.id = reviews.paper WHERE papers.area=:area AND papers.decision=:decision GROUP BY papers.id HAVING COUNT(reviews.reviewer) >= 1 ORDER BY avg(reviews.overall) DESC;",
@@ -63,7 +64,7 @@ def dbOption(Option):
 
         '''
         print("Please choose an email: ", end = '')
-        Email = str(input())
+        Email = input()
         c.execute("SELECT DISTINCT(p.title) FROM papers p, reviews r, users u WHERE r.paper = p.id AND r.reviewer = u.email AND u.email =:email ORDER BY p.id", {"email":Email})
         rows=c.fetchall()
         if not rows:
