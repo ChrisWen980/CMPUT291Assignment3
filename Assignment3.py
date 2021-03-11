@@ -10,11 +10,11 @@ To Do:
 Clarify with TA:
 For option 2 order increasing or decreasing?
 For p1, p2 do we need different erorr message for valid area/email with no output vs invalid area/email?
-For p1, p2 do we lose marks for for ___ in rows: print __[0] (is there a way to do this in SQL?)
+For p1, p2 do we lose marks for "for name in rows: print name[0]" (is there a way to do this in SQL?)
 
 Implement error handling in option 3,4
-"Some simple error handling should be performed, and the application should not crash "easily.” 
-For instance, in Task #1 (#2) if one provides an area (user email) that does not exist, instead of returning an empty result, an error message should indicate the issue. 
+"Some simple error handling should be performed, and the application should not crash "easily.”
+For instance, in Task #1 (#2) if one provides an area (user email) that does not exist, instead of returning an empty result, an error message should indicate the issue.
 Likewise in Tasks #3 and #4 the application should enforce that X and Y are positive numbers."
 '''
 import sqlite3
@@ -47,13 +47,8 @@ def dbOption(Option):
         if not rows:
             print("No accepted paper titles given this area")
         else:
-            for ttitle in rows:
-                print(ttitle[0])
-
-        #c.execute("PRAGMA table_info(reviews)")
-        #print(c.fetchall())
-        #c.execute("PRAGMA table_info(papers)")
-        #print(c.fetchall())
+            for name in rows:
+                print(name[0])
 
     elif (Option == 2):
         # This statement can be removed later
@@ -71,9 +66,8 @@ def dbOption(Option):
         if not rows:
             print("No paper has been assigned to this reviewer")
         else:
-            for eemail in rows:
-                print(eemail[0])
-
+            for name in rows:
+                print(name[0])
 
     elif (Option == 3): 
         # This statement can be removed later
@@ -85,13 +79,20 @@ def dbOption(Option):
 
         print("Please enter a percentage [X]% to find papers inconsistent reviews: ", end = '')
         Percentage = float(input()) * 0.01
-        LowerPercent = 1.00 - Percentage
-        UpperPercent = 1.00 + Percentage
-        
-        c.execute("SELECT DISTINCT papers.title, papers.id FROM papers JOIN reviews ON papers.id = reviews.paper WHERE reviews.overall < (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :lowerpercent OR reviews.overall > (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :upperpercent;",
-        {'lowerpercent': LowerPercent, 'upperpercent': UpperPercent})
-        rows=c.fetchall()
-        print(rows)
+
+        if Percentage < 0:
+            print("Percentage must be positive")
+        else:
+            LowerPercent = 1.00 - Percentage
+            UpperPercent = 1.00 + Percentage
+            c.execute("SELECT DISTINCT papers.title, papers.id FROM papers JOIN reviews ON papers.id = reviews.paper WHERE reviews.overall < (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :lowerpercent OR reviews.overall > (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :upperpercent;",
+            {'lowerpercent': LowerPercent, 'upperpercent': UpperPercent})
+            rows=c.fetchall()
+            if not rows:
+                print("No inconsistent reviews with given percentage")
+            else:
+                for name, iid in rows:
+                    print(f"{iid} {name}")
 
     elif (Option == 4):
         # This statement can be removed later
@@ -103,12 +104,9 @@ def dbOption(Option):
         #  --which is to be created only once when the application is opened-- find the email addresses and names of the reviewers that have reviewed a paper 
         # with a "difference” between X (inclusive) and Y (inclusive) where X and Y are to be provided at query time.
 
-    elif (Option == 5):
+    else: #option = 5
         print("You chose Option 5: Exit.")
         conn.close()
-
-    else:
-        print("Invalid choice, please select another.")
 
 def getOption():
     '''
