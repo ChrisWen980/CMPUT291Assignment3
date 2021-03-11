@@ -8,7 +8,6 @@ Ahmad Amin, Chris Wen
 To Do:
 
 Clarify with TA:
-For option 2 order increasing or decreasing?
 For p1, p2 do we need different erorr message for valid area/email with no output vs invalid area/email?
 For p1, p2 do we lose marks for "for name in rows: print name[0]" (is there a way to do this in SQL?)
 
@@ -24,14 +23,8 @@ def dbOption(Option):
     '''
     This function contains the implementation for the four options.
     '''
-
-    conn = sqlite3.connect('A3.db')
-    c = conn.cursor()
-    c.execute('PRAGMA foreign_keys=ON;')
-    conn.commit()
     
     if (Option == 1):
-        # This statement can be removed later
         print("You chose Option 1: Find accepted papers.")
 
         # Implement Query 1 here:
@@ -52,7 +45,6 @@ def dbOption(Option):
                 print(name[0])
 
     elif (Option == 2):
-        # This statement can be removed later
         print("You chose Option 2: Find papers assigned for review.")
 
         # Implement Query 2 here:
@@ -71,7 +63,6 @@ def dbOption(Option):
                 print(name[0])
 
     elif (Option == 3): 
-        # This statement can be removed later
         print("You chose Option 3: Find papers with inconsistent reviews.")
 
         # Implement Query 3 here:
@@ -79,26 +70,29 @@ def dbOption(Option):
         # "overall mark” for that paper. List the id and title of every paper with at least one inconsistent reviews, where X is to be provided at query time.
 
         print("Please enter a percentage [X]% to find papers inconsistent reviews: ", end = '')
-        Percentage = float(input()) * 0.01
-
-        if Percentage < 0:
-            print("Percentage must be positive")
-        else:
-            LowerPercent = 1.00 - Percentage
-            UpperPercent = 1.00 + Percentage
-            c.execute("SELECT DISTINCT papers.title, papers.id FROM papers JOIN reviews ON papers.id = reviews.paper WHERE reviews.overall < (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :lowerpercent OR reviews.overall > (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :upperpercent;",
-            {'lowerpercent': LowerPercent, 'upperpercent': UpperPercent})
-            rows=c.fetchall()
-            if not rows:
-                print("No inconsistent reviews with given percentage")
+        try:
+            Percentage = float(input()) * 0.01
+        except:
+            print("Error: Percentage is of wrong type")
+            Percentage = 'a'
+            
+        if Percentage != 'a':
+            if Percentage < 0:
+                print("Error: Percentage must be positive")
             else:
-                for name, iid in rows:
-                    print(f"{iid} {name}")
+                LowerPercent = 1.00 - Percentage
+                UpperPercent = 1.00 + Percentage
+                c.execute("SELECT DISTINCT papers.title, papers.id FROM papers JOIN reviews ON papers.id = reviews.paper WHERE reviews.overall < (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :lowerpercent OR reviews.overall > (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :upperpercent;",
+                {'lowerpercent': LowerPercent, 'upperpercent': UpperPercent})
+                rows=c.fetchall()
+                if not rows:
+                    print("No inconsistent reviews with given percentage")
+                else:
+                    for name, iid in rows:
+                        print(f"{iid} {name}")
 
     elif (Option == 4):
-        # This statement can be removed later
         print("You chose Option 4: Find papers according to difference score.")
-
         # Implement Query 4 here:
         # Create a VIEW called (exactly) "DiffScore” which contains three columns: "pid” (the paper's id), "ptitle” (the paper's title) and "difference” 
         # (for each paper how much its average score is different, in absolute value, from the average score of all papers in the same area). Using DiffScore
@@ -107,7 +101,6 @@ def dbOption(Option):
 
     else: #option = 5
         print("You chose Option 5: Exit.")
-        conn.close()
 
 def getOption():
     '''
@@ -157,4 +150,9 @@ def interface():
     print("Conference management system will now terminate")
 
 if __name__ == "__main__":
+    conn = sqlite3.connect('A3.db')
+    c = conn.cursor()
+    c.execute('PRAGMA foreign_keys=ON;')
+    conn.commit()
     interface()
+    conn.close()
