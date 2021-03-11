@@ -57,9 +57,11 @@ def dbOption(Option):
 
         print("Please enter a percentage [X]% to find papers inconsistent reviews: ", end = '')
         Percentage = float(input()) * 0.01
+        LowerPercent = 1.00 - Percentage
+        UpperPercent = 1.00 + Percentage
         
-        c.execute("SELECT DISTINCT(papers.title), papers.id FROM papers JOIN reviews ON papers.id = reviews.paper GROUP BY reviews.paper HAVING (reviews.overall < (avg(reviews.overall) - (:percent * avg(reviews.overall))) OR reviews.overall > (avg(reviews.overall) + (:percent * avg(reviews.overall))));",
-        {'percent': Percentage})
+        c.execute("SELECT DISTINCT papers.title, papers.id FROM papers JOIN reviews ON papers.id = reviews.paper WHERE reviews.overall < (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :lowerpercent OR reviews.overall > (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :upperpercent;",
+        {'lowerpercent': LowerPercent, 'upperpercent': UpperPercent})
         rows=c.fetchall()
         print(rows)
 
