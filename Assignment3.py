@@ -12,7 +12,8 @@ For option 2 order increasing or decreasing?
 For p1, p2 do we need different erorr message for valid area/email with no output vs invalid area/email?
 For p1, p2 do we lose marks for "for name in rows: print name[0]" (is there a way to do this in SQL?)
 
-Implement error handling in option 3,4
+Implement error handling in option 4
+Implement option 4
 "Some simple error handling should be performed, and the application should not crash "easily.”
 For instance, in Task #1 (#2) if one provides an area (user email) that does not exist, instead of returning an empty result, an error message should indicate the issue.
 Likewise in Tasks #3 and #4 the application should enforce that X and Y are positive numbers."
