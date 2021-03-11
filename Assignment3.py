@@ -31,7 +31,8 @@ def dbOption(Option):
         c.execute("SELECT DISTINCT(papers.title), COUNT(reviews.reviewer) FROM papers JOIN reviews ON papers.id = reviews.paper WHERE papers.area=:area AND papers.decision=:decision GROUP BY papers.id HAVING COUNT(reviews.reviewer) >= 1 ORDER BY avg(reviews.overall) DESC;",
         {"area":Area, "decision":Decision})
         rows=c.fetchall()
-        print(rows)
+        for row in rows:
+            print(row[0])
 
         #c.execute("PRAGMA table_info(reviews)")
         #print(c.fetchall())
