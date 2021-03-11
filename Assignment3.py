@@ -3,8 +3,19 @@ CMPUT 291 Winter 2021
 Assignment 3
 Ahmad Amin, Chris Wen
 '''
-import sqlite3
 
+'''
+To Do:
+
+Clarify with TA:
+For option 2 order increasing or decreasing?
+
+Implement error handling in option 3,4
+"Some simple error handling should be performed, and the application should not crash "easily.” 
+For instance, in Task #1 (#2) if one provides an area (user email) that does not exist, instead of returning an empty result, an error message should indicate the issue. 
+Likewise in Tasks #3 and #4 the application should enforce that X and Y are positive numbers."
+'''
+import sqlite3
 
 def dbOption(Option):
     '''
@@ -28,11 +39,13 @@ def dbOption(Option):
         Area = str(input())
         Decision = 'A'
         
-        c.execute("SELECT DISTINCT(papers.title), COUNT(reviews.reviewer) FROM papers JOIN reviews ON papers.id = reviews.paper WHERE papers.area=:area AND papers.decision=:decision GROUP BY papers.id HAVING COUNT(reviews.reviewer) >= 1 ORDER BY avg(reviews.overall) DESC;",
+        c.execute("SELECT DISTINCT(papers.title) FROM papers JOIN reviews ON papers.id = reviews.paper WHERE papers.area=:area AND papers.decision=:decision GROUP BY papers.id HAVING COUNT(reviews.reviewer) >= 1 ORDER BY avg(reviews.overall) DESC;",
         {"area":Area, "decision":Decision})
         rows=c.fetchall()
-        for row in rows:
-            print(row[0])
+        if not rows:
+            print("No accepted paper titles given this area")
+        else:
+            print(rows)
 
         #c.execute("PRAGMA table_info(reviews)")
         #print(c.fetchall())
@@ -47,6 +60,17 @@ def dbOption(Option):
         # Given a user's email, which is to be provided at query time, list only the titles of the papers he/she was assigned to review. The papers should 
         # be ordered by their (paper) ids (even though that is not to be displayed).  If users were not assigned to review any paper, an informative answer, 
         # e.g, "No paper has been assigned to this reviewer” should be displayed.
+
+        '''
+        print("Please choose an email: ", end = '')
+        Email = str(input())
+        c.execute("SELECT DISTINCT(p.title) FROM papers p, reviews r, users u WHERE r.paper = p.id AND r.reviewer = u.email AND u.email =:email ORDER BY p.id", {"email":Email})
+        rows=c.fetchall()
+        if not rows:
+            print("No paper has been assigned to this reviewer")
+        else:
+            print(rows)
+        '''
 
     elif (Option == 3): 
         # This statement can be removed later
