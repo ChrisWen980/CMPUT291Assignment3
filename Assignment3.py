@@ -80,10 +80,8 @@ def dbOption(Option):
             if Percentage < 0:
                 print("Error: Percentage must be positive")
             else:
-                LowerPercent = 1.00 - Percentage
-                UpperPercent = 1.00 + Percentage
-                c.execute("SELECT DISTINCT papers.title, papers.id FROM papers JOIN reviews ON papers.id = reviews.paper WHERE reviews.overall < (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :lowerpercent OR reviews.overall > (SELECT avg(overall) FROM reviews WHERE paper = papers.id) * :upperpercent;",
-                {'lowerpercent': LowerPercent, 'upperpercent': UpperPercent})
+                c.execute("SELECT DISTINCT p.title, p.id FROM papers p, reviews r WHERE r.paper = p.id AND :percent < ABS(1 - r.overall / (SELECT avg(r2.overall) FROM reviews r2 WHERE r2.paper = p.id));",
+                {'percent': Percentage})
                 rows=c.fetchall()
                 if not rows:
                     print("No inconsistent reviews with given percentage")
