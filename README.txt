@@ -4,6 +4,7 @@ ____________________________________________________________________
 ccids: aamin1, chris2
 ____________________________________________________________________
 collaboration statement: Ahmad Amin: I did not copy code from anywhere or use any unauthorized resources. Chris Wen: I did not copy code from anywhere or use any unauthorized resources.
+We looked at the a2v3 for inspiration on sql statements as we were allowed to do so.
 ____________________________________________________________________
 included files:
 
@@ -16,5 +17,6 @@ ____________________________________________________________________
 
 For modern windows machine:
 make sure python is installed, updated to most recent version, added to path etc.
-run "python3 Assignment3.py" in the directory containing all submitted files. Then follow along with the interface prompts.
+run "python3 Assignment3.py" in the directory containing all submitted files. Then follow along with the interface prompts, I won't re-copy the interface options here.
+The interface asks for which option you want, and then if you follow the interface prompts you can execute each option if you follow the simple instructions.
 ____________________________________________________________________
