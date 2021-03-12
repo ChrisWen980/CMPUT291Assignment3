@@ -97,6 +97,23 @@ def dbOption(Option):
         #  --which is to be created only once when the application is opened-- find the email addresses and names of the reviewers that have reviewed a paper 
         # with a "difference” between X (inclusive) and Y (inclusive) where X and Y are to be provided at query time.
 
+       
+
+        #c.execute("SELECT * FROM DiffScore;")
+
+
+        print("Please enter a range from [X] to [Y].")
+        print("X: ", end = "")
+        X = float(input())
+        print("Y: ", end = "")
+        Y = float(input())
+
+        c.execute("SELECT u.email, u.name FROM reviews r, users u, DiffScore d WHERE ((d.difference <= :x AND d.difference >= :y) OR (d.difference >= :x AND d.difference <= :y)) AND d.pid = r.paper AND r.reviewer = u.email",
+        {'x': X, 'y': Y})
+
+        rows=c.fetchall()
+        print(rows)
+
     else: #option = 5
         print("You chose Option 5: Exit.")
 
@@ -152,5 +169,7 @@ if __name__ == "__main__":
     c = conn.cursor()
     c.execute('PRAGMA foreign_keys=ON;')
     conn.commit()
+    c.execute("DROP VIEW DiffScore;")
+    c.execute("CREATE VIEW DiffScore AS SELECT DISTINCT p.id AS pid, p.title AS ptitle, ABS((SELECT avg(r3.overall) FROM reviews r3 WHERE r3.paper = p.id) - (SELECT avg(r2.overall) FROM reviews r2, papers p2 WHERE r2.paper = p2.id AND p2.area = p.area GROUP BY p2.area)) AS difference FROM papers p, reviews r WHERE r.paper = p.id;")
     interface()
     conn.close()
