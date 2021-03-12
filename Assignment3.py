@@ -64,6 +64,7 @@ def dbOption(Option):
 
     elif (Option == 3): 
         print("You chose Option 3: Find papers with inconsistent reviews.")
+        inputCorrect = True
 
         # Implement Query 3 here:
         # A review for a paper is inconsistent wrt others if it has an overall mark different by more than X% (above of below) of the average of all 
@@ -74,45 +75,65 @@ def dbOption(Option):
             Percentage = float(input()) * 0.01
         except:
             print("Error: Percentage is of wrong type")
-            Percentage = 'a'
+            inputCorrect = False
+        
+        if inputCorrect and Percentage < 0:
+            print("Error: Percentage must be positive")
+            inputCorrect = False
             
-        if Percentage != 'a':
-            if Percentage < 0:
-                print("Error: Percentage must be positive")
+        if inputCorrect:
+            c.execute("SELECT DISTINCT p.title, p.id FROM papers p, reviews r WHERE r.paper = p.id AND :percent < ABS(1 - r.overall / (SELECT avg(r2.overall) FROM reviews r2 WHERE r2.paper = p.id));",
+            {'percent': Percentage})
+            rows=c.fetchall()
+            if not rows:
+                print("No inconsistent reviews with given percentage")
             else:
-                c.execute("SELECT DISTINCT p.title, p.id FROM papers p, reviews r WHERE r.paper = p.id AND :percent < ABS(1 - r.overall / (SELECT avg(r2.overall) FROM reviews r2 WHERE r2.paper = p.id));",
-                {'percent': Percentage})
-                rows=c.fetchall()
-                if not rows:
-                    print("No inconsistent reviews with given percentage")
-                else:
-                    for name, iid in rows:
-                        print(f"{iid} {name}")
+                for name, iid in rows:
+                    print(f"{iid} {name}")
 
     elif (Option == 4):
         print("You chose Option 4: Find papers according to difference score.")
+        inputCorrect = True
         # Implement Query 4 here:
         # Create a VIEW called (exactly) "DiffScore” which contains three columns: "pid” (the paper's id), "ptitle” (the paper's title) and "difference” 
         # (for each paper how much its average score is different, in absolute value, from the average score of all papers in the same area). Using DiffScore
         #  --which is to be created only once when the application is opened-- find the email addresses and names of the reviewers that have reviewed a paper 
         # with a "difference” between X (inclusive) and Y (inclusive) where X and Y are to be provided at query time.
-
-       
-
         #c.execute("SELECT * FROM DiffScore;")
-
 
         print("Please enter a range from [X] to [Y].")
         print("X: ", end = "")
-        X = float(input())
-        print("Y: ", end = "")
-        Y = float(input())
+        try:
+            X = float(input())
+        except:
+            print("Error: range is of wrong type")
+            inputCorrect = False
 
-        c.execute("SELECT u.email, u.name FROM reviews r, users u, DiffScore d WHERE ((d.difference <= :x AND d.difference >= :y) OR (d.difference >= :x AND d.difference <= :y)) AND d.pid = r.paper AND r.reviewer = u.email",
-        {'x': X, 'y': Y})
+        if inputCorrect and X < 0:
+            print("Error: range boundary negative")
+            inputCorrect = False
+        
+        if inputCorrect:
+            print("Y: ", end = "")
+            try:
+                Y = float(input())
+            except:
+                print("Error: range is of wrong type")
+                inputCorrect = False
 
-        rows=c.fetchall()
-        print(rows)
+        if inputCorrect and Y < 0:
+            print("Error: range boundary negative")
+            inputCorrect = False
+
+        if inputCorrect:
+            c.execute("SELECT u.email, u.name FROM reviews r, users u, DiffScore d WHERE ((d.difference <= :x AND d.difference >= :y) OR (d.difference >= :x AND d.difference <= :y)) AND d.pid = r.paper AND r.reviewer = u.email",
+            {'x': X, 'y': Y})
+            rows=c.fetchall()
+            if not rows:
+                print("No reviewers given this range")
+            else:
+                for email, name in rows:
+                    print(f"{email} {name}")
 
     else: #option = 5
         print("You chose Option 5: Exit.")
@@ -169,7 +190,7 @@ if __name__ == "__main__":
     c = conn.cursor()
     c.execute('PRAGMA foreign_keys=ON;')
     conn.commit()
-    c.execute("DROP VIEW DiffScore;")
+    c.execute("DROP VIEW IF EXISTS DiffScore;")
     c.execute("CREATE VIEW DiffScore AS SELECT DISTINCT p.id AS pid, p.title AS ptitle, ABS((SELECT avg(r3.overall) FROM reviews r3 WHERE r3.paper = p.id) - (SELECT avg(r2.overall) FROM reviews r2, papers p2 WHERE r2.paper = p2.id AND p2.area = p.area GROUP BY p2.area)) AS difference FROM papers p, reviews r WHERE r.paper = p.id;")
     interface()
     conn.close()
